@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groundwater Prediction</title>
+</head>
+<body>
+    <h1>Groundwater Prediction</h1>
+    <form action="/predict" method="post">
+        <!-- Add input fields for the features in your dataset -->
+        <label for="feature1">Feature 1:</label>
+        <input type="text" id="feature1" name="feature1"><br><br>
+        <label for="feature2">Feature 2:</label>
+        <input type="text" id="feature2" name="feature2"><br><br>
+        <!-- Add more input fields as needed -->
+        <input type="submit" value="Predict">
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetch('/predict', {
+                method: 'POST',
+                body: new FormData(event.target)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = data.result;
+            });
+        });
+    </script>
+</body>
+</html>

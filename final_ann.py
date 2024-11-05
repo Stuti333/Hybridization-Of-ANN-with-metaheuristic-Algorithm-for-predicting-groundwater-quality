@@ -247,8 +247,8 @@ val=ff.forward_propagation( X_train)
 
 acc,losss,rm=ff.train(X_train,y_train,10,0.01)
 ac=acc[0]
-#print("\ntrain: ",acc,losss)
-#print("\n\n round: ",ff.predict(X_train))
+# print("\ntrain: ",acc,losss)
+# print("\n\n round: ",ff.predict(X_train))
 print("rmse: ",rm[len(rm)-1])
 print("Accuracy: ",ac)
 print("Loss: ",losss[len(losss)-1])
