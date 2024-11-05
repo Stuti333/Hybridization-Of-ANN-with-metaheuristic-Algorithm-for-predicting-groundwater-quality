@@ -19,11 +19,17 @@ data = pd.read_csv('Ground Water .csv')
 
 
 
-data = data.fillna(data.mean())
+#data = data.fillna(data.mean())
+# Fill NaN values only in numeric columns with median
+numeric_columns = data.select_dtypes(include='number').columns
+data[numeric_columns] = data[numeric_columns].fillna(data[numeric_columns].median())
 
 
+# Select only numeric columns for quantile calculations
+numeric_data = data.select_dtypes(include=[np.number])
+data[numeric_data.columns] = numeric_data.clip(lower=numeric_data.quantile(0.01), upper=numeric_data.quantile(0.99), axis=1)
 
-data = data.clip(lower=data.quantile(0.01), upper=data.quantile(0.99), axis=1)
+#data = data.clip(lower=data.quantile(0.01), upper=data.quantile(0.99), axis=1)
 
 data = pd.get_dummies(data)
 
@@ -94,8 +100,13 @@ class NeuralNetwork:
         print("\nB1:",self.b1)
         print("\nB2:",self.b2)
    
-    def sigmoid(self,x):
-        return(1/(1 + np.exp(-x)))
+    def sigmoid(self, x):
+        x = np.array(x, dtype=float)  # Ensure x is a NumPy array of floats
+        if np.isnan(x).any():
+            raise ValueError("Input contains NaN values.")
+        return 1 / (1 + np.exp(-x))
+
+
        
     def forward_propagation(self, X):
         self.Z1 =np.dot(X,self.W1) + self.b1
@@ -145,6 +156,9 @@ class NeuralNetwork:
         #print("\ndw2: ",dW2)
         #print("\ndb2: ",db2)
         # Update the weights and biases
+        self.W1 = self.W1.astype('float64')
+        dW1 = dW1.astype('float64')
+
         self.W1 -= learning_rate*dW1
         self.b1 -= learning_rate*db1
         self.W2 -= learning_rate*dW2

@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue May  9 16:45:35 2023
-
-@author: Nupur
-"""
 
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -14,14 +8,15 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import mean_squared_error
 data = pd.read_csv('Ground Water .csv')
-#print(data)
 
-# Handle missing values
-data = data.fillna(data.mean())
-#print(data)
+numeric_columns = data.select_dtypes(include='number').columns
+data[numeric_columns] = data[numeric_columns].fillna(data[numeric_columns].median())
 
-# Handle outliers
-data = data.clip(lower=data.quantile(0.01), upper=data.quantile(0.99), axis=1)
+
+# Select only numeric columns for quantile calculations
+numeric_data = data.select_dtypes(include=[np.number])
+data[numeric_data.columns] = numeric_data.clip(lower=numeric_data.quantile(0.01), upper=numeric_data.quantile(0.99), axis=1)
+
 
 # Encode categorical variables
 data = pd.get_dummies(data)
@@ -225,7 +220,8 @@ class NeuralNetwork:
         #print("\nB2size: ",len(self.b2))
    
     def sigmoid(self,x):
-        return(1/(1 + np.exp(-x)))
+        x = np.array(x, dtype=float) 
+        return 1 / (1 + np.exp(-x))
        
     def forward_propagation(self, X):
         # Calculate the hidden layer activations
@@ -357,6 +353,8 @@ class NeuralNetwork:
         #print("\ndw2: ",dW2)
         #print("\ndb2: ",db2)
         # Update the weights and biases
+        self.W1 = self.W1.astype('float64')
+        dW1 = dW1.astype('float64')
         self.W1 -= learning_rate*dW1
         self.b1 -= learning_rate*db1
         self.W2 -= learning_rate*dW2
